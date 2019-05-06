@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+    <!--
+        此标签用来扫描包以及包下面的类，被扫描到的类就可以使用注解，如@Service等，同时被扫描到后就会被放入IOC容器中，
+        之所以不扫描Controller，就是因为Controller是要交给SpringMVC扫描的，后面会看到
+        我们希望 Spring 只不扫描带有 @Controller 注解标注的类，而扫描其他注解标注的类，而这时建立在使用默认的 Filter 进行扫描的基础上，设置了 context:exclude-filter 标签，不扫描 @Controller 注解标注的类，所以不应该设置 use-default-filters 为 false
+    -->
+  <context:component-scan base-package="cn.banana.money.*">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan> 
+    
+     <!--
+        事务控制，这个是Spring本身的配置了，如果你不明白的话，还是建议再去学学Spring
+        这个最主要的作用就是：比如插入一条数据出错的时候，前面已经插入到数据库中部分信息，出错了就需要先将数据从数据库中删除，不对数据造成污染
+    -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--控制数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    
+    
+     <!-- 引用配置文件 -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    
+    
+    <!--配置连接池，引入了jdbc.properties以后，就可以很方便的使用配置信息，但是必须要用${}这种形式调用-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
+        <property name="user" value="${jdbc.usernaem}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--
+        配置mybatis整合开发
+        Mybatis首先要有一个数据源，所以我们就将刚刚配置的连接池注入进来
+        然后还需要mapper.xml文件的路径，之前学Mybatis的时候都是手动创建**.xml文件，然后用接口去映射，
+        好消息是mybatis能够帮助我们根据数据库逆向生成这个文件及接口，极大的方便了我们的开发
+        最后就是mybatis的配置文件，我们会在后面看到
+        -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- <property name="mapperLocations" value="classpath:mapper/*.xml"/> -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        
+        
+    </bean>
+
+
+  	<!--  自动扫描对象关系映射 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    	 <!--    指定会话工厂，如果当前上下文中只定义了一个则该属性可省去 -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+        <!-- 指定要自动扫描接口的基础包，实现接口 -->
+        <property name="basePackage" value="cn.banana.money.*"></property>
+    </bean>
+    
+
+</beans>
