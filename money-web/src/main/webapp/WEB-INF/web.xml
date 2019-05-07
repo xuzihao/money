@@ -5,6 +5,7 @@
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
   
+  
    <!-- 启动spring容器,并且需要配置Spring的配置文件，这样Spring容器才能够正确的启动	-->
   <context-param>
       <param-name>contextConfigLocation</param-name>
@@ -26,6 +27,11 @@
   </filter>
   
   <!--配置filter的映射-->
+   <filter-mapping>
+    	<filter-name>characterEncodingFilter</filter-name>
+    	<url-pattern>*.html</url-pattern>
+   </filter-mapping>
+  
   <filter-mapping>
       <filter-name>characterEncodingFilter</filter-name>
       <url-pattern>/*</url-pattern>
@@ -36,16 +42,23 @@
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
   
+  
   <!-- 监听springMVC 配置 -->
   <servlet>
       <servlet-name>money</servlet-name>
       <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
   </servlet>
+  
+  <!--  <servlet-mapping>  
+    <servlet-name>default</servlet-name>  
+    <url-pattern>*.html</url-pattern>  
+	</servlet-mapping>  -->
  
   <servlet-mapping>
       <servlet-name>money</servlet-name>
-      <url-pattern>/</url-pattern>
+      <url-pattern>*.do</url-pattern>
   </servlet-mapping>
-  
+
+   
 </web-app>

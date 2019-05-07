@@ -22,13 +22,25 @@
     <mvc:annotation-driven />
 
     <!-- 访问静态资源 -->
-    <mvc:default-servlet-handler />
+    <!-- <mvc:default-servlet-handler /> -->
+    <!-- <mvc:default-servlet-handler default-servlet-name="所使用的Web服务器默认使用的Servlet名称" />   -->
+    <mvc:resources mapping="/static/**" location="/static/" />
     
     <!-- 视图解析器 -->
     <bean
         class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/view/"></property>
         <property name="suffix" value=".jsp"></property>
+    </bean>
+    
+    
+    
+     <!--访问html-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/static/html/"/>
+        <property name="order" value="1"/>
+        <property name="suffix" value=".html"/>
     </bean>
     
 </beans>
